@@ -26,6 +26,7 @@
 4. 2026-10-23　最简登录页 demo（`feature/login-demo`，未合并）— 马力
 5. 2026-10-23　项目内 conda 环境（Python 3.9.25 + Flask 3.0.3）+ 使用说明 — 马力
 6. 2026-10-23　运行规范、接口说明规范 — 马力
+7. 2026-10-23　登录 demo 全量注释 + 抽出 `config.py`（配置集中）— 马力
 
 ## 三、进行中
 
@@ -57,5 +58,5 @@
 | 分支 | 内容 | 是否合入 main |
 | --- | --- | --- |
 | `main` | 文档基线（README、docs） | — |
-| `develop` | 与 main 一致 | — |
-| `feature/login-demo` | `app.py` + `templates/`（登录 demo） | 否，明确不合并 |
+| `develop` | 文档基线 + 环境与规范，功能分支的合并目标 | — |
+| `feature/login-demo` | `app.py` + `config.py` + `templates/`（登录 demo，含全量注释） | 否，明确不合并 |
