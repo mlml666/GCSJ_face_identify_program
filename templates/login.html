@@ -1,24 +1,35 @@
 <!doctype html>
+<!--
+  登录页（demo）
+  对应需求：P0-01 用户登录与角色权限
+  数据来源：app.py 的 login_page / login 视图
+  约定：错误提示统一显示在表单上方的 alert 条幅里（见 docs/规范-运行规范.md）
+-->
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
+  <!-- 一期以桌面端为主，只保证 1366×768 以上；手机端自适应放二期 -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>登录 · 课堂人脸验证考勤系统</title>
+  <!-- Bootstrap 5 CDN：一期不引入前端构建工具，保持零依赖启动 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+  <!-- 垂直居中的卡片式登录框 -->
   <div class="container min-vh-100 d-flex align-items-center justify-content-center">
     <div class="card shadow-sm" style="width: 22rem;">
       <div class="card-body p-4">
         <h5 class="card-title text-center mb-1">课堂人脸验证考勤系统</h5>
         <p class="text-center text-muted small mb-4">Face Attendance System · V1.0</p>
 
+        <!-- 错误提示：由 flash() 写入，读取一次后自动清除 -->
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <div class="alert alert-danger py-2 small mb-3" role="alert">{{ messages[0] }}</div>
           {% endif %}
         {% endwith %}
 
+        <!-- 登录表单：提交到 POST /login；用户名回填，方便改错重试 -->
         <form method="post" action="{{ url_for('login') }}">
           <div class="mb-3">
             <label class="form-label small" for="username">账号</label>
@@ -32,6 +43,7 @@
         </form>
 
         <hr class="my-3">
+        <!-- 演示账号提示：正式版上线前删除本段 -->
         <p class="text-muted small mb-0">
           演示账号：admin / admin123　teacher / teacher123<br>
           仅用于流程演示，正式版需替换为数据库账号。
