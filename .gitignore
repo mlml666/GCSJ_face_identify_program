@@ -33,3 +33,9 @@ documents/
 ~$*
 *.tmp
 environment-lock.txt
+
+# pip 安装中断留下的临时目录（可能因权限无法删除，忽略即可）
+pip-build-tracker-*/
+pip-ephem-wheel-cache-*/
+pip-install-*/
+pip-unpack-*/
