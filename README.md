@@ -10,36 +10,49 @@
 
 ## 技术栈
 
-Python 3.9+ / Flask 3 / SQLite / HTML + Bootstrap 5 / face_recognition（未接入）
+Python 3.9 / Flask 3 / SQLite / HTML + Bootstrap 5 / face_recognition（未接入）
 
 ## 目录结构
 
 ```
 .
 ├─ README.md
-├─ requirements.txt
+├─ requirements.txt            依赖清单
+├─ environment.yml             conda 环境定义（团队统一）
+├─ .conda/                     项目内虚拟环境（本地生成，不进 Git）
 ├─ docs/
-│  ├─ PROGRESS.md      团队进度看板
-│  ├─ AI_SYNC.md       给 AI 的进度快照（换人/换 AI 先读这个）
-│  ├─ BRANCHING.md     分支、提交、合并规范
-│  ├─ progress/        6 名成员的个人进度
-│  ├─ 项目资料/        群文件里的原始文档
-│  └─ 交付物/          我们产出、待甲方签字的文档
-├─ app.py              登录 demo（只在 feature/login-demo 分支）
-└─ templates/          同上
+│  ├─ 环境说明-conda虚拟环境使用.md
+│  ├─ 规范-运行规范.md
+│  ├─ 规范-接口说明规范.md
+│  ├─ PROGRESS.md              团队进度看板
+│  ├─ AI_SYNC.md               给 AI 的进度快照（换人/换 AI 先读这个）
+│  ├─ BRANCHING.md             分支、提交、合并规范
+│  ├─ progress/                6 名成员的个人进度
+│  ├─ 项目资料/                群文件里的原始文档
+│  └─ 交付物/                  我们产出、待甲方签字的文档
+├─ app.py                      登录 demo（只在 feature/login-demo 分支）
+└─ templates/                  同上
 ```
+
+## 环境准备（Anaconda，环境装在项目内）
+
+```powershell
+conda env create -p .conda -f environment.yml    # 首次创建，约 2—5 分钟
+.\.conda\python.exe -c "import flask; print(flask.__version__)"   # 验证
+```
+
+细节与排错见 [环境说明](docs/环境说明-conda虚拟环境使用.md)。
 
 ## 本地运行
 
-```bash
-git clone <repo-url>
-cd GCSJ_face_identify_program
-pip install -r requirements.txt
+```powershell
 git checkout feature/login-demo     # 目前唯一有代码的分支
-python app.py                       # 浏览器打开 http://127.0.0.1:5000
+.\.conda\python.exe app.py          # 浏览器打开 http://127.0.0.1:5000
 ```
 
 demo 账号：`admin / admin123`、`teacher / teacher123`（仅演示用，正式版必须替换掉）
+
+开发约束见 [运行规范](docs/规范-运行规范.md)；新增接口前先读 [接口说明规范](docs/规范-接口说明规范.md)。
 
 ## 分支
 
@@ -66,6 +79,9 @@ demo 账号：`admin / admin123`、`teacher / teacher123`（仅演示用，正�
 
 ## 文档索引
 
+- 使用说明：[docs/环境说明-conda虚拟环境使用.md](docs/环境说明-conda虚拟环境使用.md)
+- 运行规范：[docs/规范-运行规范.md](docs/规范-运行规范.md)
+- 接口规范：[docs/规范-接口说明规范.md](docs/规范-接口说明规范.md)
 - 团队进度：[docs/PROGRESS.md](docs/PROGRESS.md)
 - AI 同步：[docs/AI_SYNC.md](docs/AI_SYNC.md)
 - 分支规范：[docs/BRANCHING.md](docs/BRANCHING.md)
