@@ -1,7 +1,6 @@
 # Python
 __pycache__/
 *.py[cod]
-.venv/
 venv/
 env/
 
@@ -22,8 +21,15 @@ data/faces/
 .idea/
 .vscode/
 
+# 项目内虚拟环境与构建缓存：体积大，可随时重建
+.conda/
+.conda-pkgs/
+.venv/
+.tmp/
+
 # 本地临时文件
 documents/
 .dsh-pdf-reader/
 ~$*
 *.tmp
+environment-lock.txt

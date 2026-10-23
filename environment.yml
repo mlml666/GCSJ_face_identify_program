@@ -1,0 +1,7 @@
+name: facs
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - flask=3.0.3
+  - pip

@@ -18,16 +18,26 @@
   },
   "code": {
     "entry": "app.py",
+    "config": "config.py（配置集中处，SECRET_KEY / 上传限制 / 比对阈值）",
     "templates": ["login.html", "index.html"],
     "database": "none yet",
     "face_recognition": "not integrated",
     "static": "none"
   },
+  "env": {
+    "type": "conda，创建在项目内",
+    "path": ".conda/python.exe",
+    "python": "3.9.25",
+    "flask": "3.0.3",
+    "note": "不进 Git，按 docs/环境说明-conda虚拟环境使用.md 重建"
+  },
   "done": [
     "需求优先级清单 V1.1（docs/交付物）",
     "需求调研会议纪要 V1.0（docs/交付物）",
     "仓库结构 + 分支规范 + 进度文档",
-    "最简登录页 demo（feature/login-demo）"
+    "最简登录页 demo（feature/login-demo）",
+    "项目内 conda 环境 + 环境使用说明",
+    "运行规范 + 接口说明规范"
   ],
   "in_progress": ["SRS V1.1 修订", "登录 demo 评审"],
   "blocked_by": ["TBD-1 人数 30/42", "TBD-2 工期 40/43/55 天"],
