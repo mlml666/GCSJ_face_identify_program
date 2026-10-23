@@ -112,9 +112,27 @@ conda env export -p .conda > environment-lock.txt
 
 ## 七、清理
 
+### 7.1 只清缓存，不动环境（日常）
+
 ```powershell
-# 停掉正在跑的进程后
-Remove-Item -Recurse -Force .conda
+# conda 包缓存：约 330MB，删掉不影响已建好的环境，只是下次装依赖会重新下载
+Remove-Item -Recurse -Force .conda-pkgs
+
+# Python 字节码缓存：运行时自动重建
+Get-ChildItem -Recurse -Directory -Filter __pycache__ | Where-Object { $_.FullName -notlike '*\.conda\*' } | Remove-Item -Recurse -Force
 ```
 
-重装即回到干净状态，项目代码与文档不受影响。
+清理后环境照常可用，验证：
+
+```powershell
+.\.conda\python.exe -c "import flask; print(flask.__version__)"
+```
+
+### 7.2 连环境一起删（重装）
+
+```powershell
+# 先停掉正在跑的 flask 进程
+Remove-Item -Recurse -Force .conda, .conda-pkgs
+```
+
+重装即回到干净状态，项目代码与文档不受影响。`.tmp` 是 pip 的临时目录，被 `.gitignore` 忽略，删不掉也不影响使用。
