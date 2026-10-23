@@ -1,0 +1,7 @@
+# 一期 Web 端依赖（当前只有登录 demo 用得上）
+Flask==3.0.3
+
+# 后续按 P0 需求逐步追加，先不装：
+# face_recognition==1.3.0   # 依赖 dlib，Windows 需预编译 whl
+# numpy
+# openpyxl                  # Excel 导出（P1-03）

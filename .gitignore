@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# 数据库与实例数据：随时可重建，不进仓库
+*.db
+*.sqlite3
+instance/
+
+# 环境变量
+.env
+.env.*
+
+# 生物特征数据：严禁入库
+data/photos/
+data/faces/
+
+# 编辑器
+.idea/
+.vscode/
+
+# 本地临时文件
+documents/
+.dsh-pdf-reader/
+~$*
+*.tmp
