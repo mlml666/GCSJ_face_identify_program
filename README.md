@@ -1,90 +1,129 @@
 # 课堂人脸验证考勤系统（FACS）
 
-成都信息工程大学人工智能学院课程工程实践项目。一期做 PC 浏览器 Web 端：教师按名单顺序点名、学生现场照片与存档照片做 1:1 人脸验证、考勤记录自动统计。
+> 成都信息工程大学人工智能学院 · 课程工程实践项目 · 一期 PC 浏览器 Web 端
+> 用「按名单顺序点名 + 现场照片 1:1 人脸验证」替代人工点名，把单节课考勤从约 15 分钟压缩到 5 分钟以内。
 
-## 当前状态
+**验收指标**：整节课（一个班）点名 ≤ 5 分钟；正常光照识别准确率 ≥ 90%（合格线 85%）；考勤数据准确率 100%；单次比对响应 ≤ 2 秒。
 
-- 一期范围：PC 浏览器 Web 端（教师端 + 管理端）；学生手机自助页放二期
-- 需求阶段：已产出《需求优先级清单 V1.1》《需求调研会议纪要》，待双方签字；《软件需求规格说明书》V1.1 待修订
-- 代码：只有一个最简登录页 demo，在 `feature/login-demo` 分支，**未合入 main**
+## 当前进度
+
+| 阶段 | 状态 |
+| --- | --- |
+| 需求基线（优先级清单 + 会议纪要 + SRS） | 🟡 待双方签字（SRS V1.1 待修订） |
+| 技术方案与 dlib / face_recognition 验证 | ⬜ 未开始 |
+| 环境与数据准备 | 🟢 开发环境已就绪 |
+| 开发实现（Web 端一期） | 🟢 登录页 demo 完成 |
+| 特征库 / 测试 / 培训试运行 / 验收 | ⬜ 未开始 |
+
+代码现状：**只有一个登录页 demo**，在 `feature/login-demo` 分支，按约定不合并进 `main`。
+
+## 快速开始
+
+```powershell
+git clone https://github.com/mlml666/GCSJ_face_identify_program.git
+cd GCSJ_face_identify_program
+
+# 1. 创建项目内虚拟环境（Anaconda，装在 .conda\ 下，不进仓库）
+conda env create -p .conda -f environment.yml
+
+# 2. 切到有代码的分支并运行
+git checkout feature/login-demo
+.\.conda\python.exe app.py        # 浏览器打开 http://127.0.0.1:5000
+```
+
+演示账号：`admin / admin123`、`teacher / teacher123`（仅演示，正式版必须替换）。
+
+环境细节、IDE 指定解释器、排错方式见 [环境说明](docs/环境说明-conda虚拟环境使用.md)。
 
 ## 技术栈
 
-Python 3.9 / Flask 3 / SQLite / HTML + Bootstrap 5 / face_recognition（未接入）
+| 层 | 选型 |
+| --- | --- |
+| 运行环境 | Python 3.9.25（conda，项目内 `.conda\`） |
+| Web 框架 | Flask 3.0.3 |
+| 数据库 | SQLite 3 |
+| 前端 | HTML + Bootstrap 5（CDN，无构建工具） |
+| 人脸识别 | face_recognition / dlib（**未接入**，128 维特征 + 1:1 比对） |
 
 ## 目录结构
 
 ```
 .
 ├─ README.md
-├─ requirements.txt            依赖清单
-├─ environment.yml             conda 环境定义（团队统一）
-├─ .conda/                     项目内虚拟环境（本地生成，不进 Git）
+├─ requirements.txt             pip 依赖清单
+├─ environment.yml              conda 环境定义
+├─ app.py                       启动入口 + 登录 demo 路由
+├─ config.py                    配置集中处（密钥、上传限制、比对阈值）
+├─ templates/                   Jinja2 模板
 ├─ docs/
 │  ├─ 环境说明-conda虚拟环境使用.md
-│  ├─ 规范-运行规范.md
-│  ├─ 规范-接口说明规范.md
-│  ├─ PROGRESS.md              团队进度看板
-│  ├─ AI_SYNC.md               给 AI 的进度快照（换人/换 AI 先读这个）
-│  ├─ BRANCHING.md             分支、提交、合并规范
-│  ├─ progress/                6 名成员的个人进度
-│  ├─ 项目资料/                群文件里的原始文档
-│  └─ 交付物/                  我们产出、待甲方签字的文档
-├─ app.py                      登录 demo（只在 feature/login-demo 分支）
-└─ templates/                  同上
+│  ├─ 规范-运行规范.md           启动、配置、编码、提交前检查
+│  ├─ 规范-接口说明规范.md       响应格式、错误码、接口清单与文档模板
+│  ├─ PROGRESS.md               团队进度看板
+│  ├─ AI_SYNC.md                给 AI 的进度快照（换人先读这个）
+│  ├─ BRANCHING.md              分支、提交、合并规范
+│  ├─ progress/                 6 名成员的个人进度
+│  ├─ 项目资料/                 群文件原始文档（分工、实施计划、SRS 草稿）
+│  └─ 交付物/                   待甲方签字的产出物
+└─ .conda/                      本地虚拟环境（git 忽略）
 ```
-
-## 环境准备（Anaconda，环境装在项目内）
-
-```powershell
-conda env create -p .conda -f environment.yml    # 首次创建，约 2—5 分钟
-.\.conda\python.exe -c "import flask; print(flask.__version__)"   # 验证
-```
-
-细节与排错见 [环境说明](docs/环境说明-conda虚拟环境使用.md)。
-
-## 本地运行
-
-```powershell
-git checkout feature/login-demo     # 目前唯一有代码的分支
-.\.conda\python.exe app.py          # 浏览器打开 http://127.0.0.1:5000
-```
-
-demo 账号：`admin / admin123`、`teacher / teacher123`（仅演示用，正式版必须替换掉）
-
-开发约束见 [运行规范](docs/规范-运行规范.md)；新增接口前先读 [接口说明规范](docs/规范-接口说明规范.md)。
 
 ## 分支
 
-| 分支 | 用途 | 现状 |
+| 分支 | 内容 | 说明 |
 | --- | --- | --- |
-| `main` | 稳定主干，只接受 PR 合入 | 文档基线，无业务代码 |
-| `develop` | 集成分支，功能分支先合这里 | 与 main 一致 |
-| `feature/login-demo` | 最简登录页 demo | 唯一有代码的分支，不并入 main |
+| `main` | 文档基线 | 稳定主干，只接受 PR |
+| `develop` | 文档 + 环境说明 + 规范 | 集成分支，功能分支先合这里 |
+| `feature/login-demo` | `app.py`、`config.py`、`templates/` | 登录 demo，**不合并进 main** |
 
-详见 [docs/BRANCHING.md](docs/BRANCHING.md)。
+协作流程：
 
-## 协作流程
+```powershell
+git checkout develop && git pull
+git checkout -b feature/<模块>-<简述>
+# 改代码 → 更新 docs/PROGRESS.md 和自己那页 → commit → push → 提 PR 到 develop
+```
 
-1. `git checkout develop && git pull`
-2. `git checkout -b feature/<模块>-<简述>`
-3. 提交前同步更新 `docs/PROGRESS.md` 和 `docs/AI_SYNC.md`
-4. push 后提 PR 到 `develop`，至少 1 人评审再合
+提交信息格式 `<type>: <中文简述>`，type 取 `feat` / `fix` / `docs` / `chore`。详见 [分支规范](docs/BRANCHING.md)。
 
-## 红线
+## 团队分工
 
-- 学生照片、人脸特征向量、`.db` 数据库文件一律不进 Git
-- `feature/login-demo` 等实验分支不直接合入 `main`
-- 人数与工期口径未确认（TBD-1 / TBD-2），文档里不要写死
+| 成员 | 角色 | 主要负责 | 占比 |
+| --- | --- | --- | --- |
+| 刘青松 | 组长 / 项目经理 | 计划、进度与风险、对外接口、验收组织 | 17% |
+| 马力 | 需求分析师 | 调研、需求规格说明书、原型、优先级清单、用户测试组织 | 15% |
+| 邓先斌 | 技术架构师 / 后端组长 | 架构、数据库设计、人脸比对核心与阈值调优、部署 | 20% |
+| 阮亚宁 | 后端 / 数据工程师 | 学生与课程管理、考勤记录、统计导出、特征库脚本 | 18% |
+| 王彦哲 | 前端工程师 | 点名页、管理端页面、Bootstrap 样式与图表 | 16% |
+| 石子墨 | 测试与实施 / 培训讲师 | 测试计划与准确率测试、培训材料、试运行值守、售后 | 14% |
+
+个人进度见 [docs/progress/](docs/progress)。
 
 ## 文档索引
 
-- 使用说明：[docs/环境说明-conda虚拟环境使用.md](docs/环境说明-conda虚拟环境使用.md)
-- 运行规范：[docs/规范-运行规范.md](docs/规范-运行规范.md)
-- 接口规范：[docs/规范-接口说明规范.md](docs/规范-接口说明规范.md)
-- 团队进度：[docs/PROGRESS.md](docs/PROGRESS.md)
-- AI 同步：[docs/AI_SYNC.md](docs/AI_SYNC.md)
-- 分支规范：[docs/BRANCHING.md](docs/BRANCHING.md)
-- 个人进度：[docs/progress/](docs/progress)
-- 原始材料：[docs/项目资料/](docs/项目资料)
-- 待签交付物：[docs/交付物/](docs/交付物)
+| 文档 | 用途 |
+| --- | --- |
+| [环境说明](docs/环境说明-conda虚拟环境使用.md) | 创建 / 使用 / 排错 / 清理项目内虚拟环境 |
+| [运行规范](docs/规范-运行规范.md) | 启动方式、配置约定、编码规范、提交前检查清单 |
+| [接口说明规范](docs/规范-接口说明规范.md) | 统一响应、错误码、22 个接口清单与单接口模板 |
+| [团队进度](docs/PROGRESS.md) | 阶段进度、谁在做什么、阻塞项 |
+| [AI 同步](docs/AI_SYNC.md) | 机器可读的进度快照与关键决策 |
+| [分支规范](docs/BRANCHING.md) | 分支模型、命名、提交与合并规则 |
+| [项目资料](docs/项目资料/) | 群文件原始文档 + 已知口径冲突清单 |
+| [交付物](docs/交付物/) | 需求优先级清单 V1.1、需求调研会议纪要 |
+
+## 常见问题
+
+| 现象 | 处理 |
+| --- | --- |
+| `ModuleNotFoundError: flask` | 用错解释器了，改用 `.\.conda\python.exe`，或在 IDE 里把解释器指到 `.conda\python.exe` |
+| 端口 5000 被占用 | `netstat -ano \| findstr :5000` 找到 PID 后结束进程，或改 `app.run(port=5001)` |
+| `conda activate` 报 shell 未初始化 | `conda init powershell` 后重开终端 |
+| 装 dlib / face_recognition 失败 | 别硬编译，改用预编译 whl 或 conda-forge 的 dlib |
+
+## 红线
+
+- 学生照片、人脸特征向量、`*.db` 数据库文件**一律不进仓库**
+- `feature/login-demo` 等实验分支**不直接合入 main**
+- 人数与工期口径未确认（TBD-1 30/42 人、TBD-2 40/43/55 天），文档里不要写死
+- 采集学生照片前须取得知情同意，数据仅用于本课堂考勤
