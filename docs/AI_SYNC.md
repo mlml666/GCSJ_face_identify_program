@@ -8,6 +8,7 @@
 ```json
 {
   "project": "GCSJ_face_identify_program",
+  "remote": "https://github.com/mlml666/GCSJ_face_identify_program (private, 默认分支 develop)",
   "scope": "一期 PC 浏览器 Web 端（教师端 + 管理端），学生手机端二期",
   "phase": "需求基线收尾 / 开发提前启动",
   "updated": "2026-10-23",
