@@ -22,12 +22,19 @@ from datetime import datetime
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 
-from config import ALLOWED_EXTENSIONS, FACE_MATCH_THRESHOLD, MAX_CONTENT_LENGTH, SECRET_KEY
+from config import (
+    ALLOWED_EXTENSIONS,
+    FACE_MATCH_THRESHOLD,
+    MAX_CONTENT_LENGTH,
+    PERMANENT_SESSION_LIFETIME,
+    SECRET_KEY,
+)
 
 # ---------------------------------------------------------------- 应用初始化
 app = Flask(__name__)
 app.secret_key = SECRET_KEY  # 会话签名密钥，缺失时由 config.py 提供开发缺省值
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH  # 超过上限时 Flask 返回 413
+app.config["PERMANENT_SESSION_LIFETIME"] = PERMANENT_SESSION_LIFETIME  # 登录会话有效期
 
 # 演示账号表。正式版改为 users 表：
 #   username / password_hash（werkzeug.security 生成）/ role / 关联教师
@@ -91,18 +98,17 @@ def _kiosk_state():
 
 
 def _mock_verify(force_fail=False):
-    """1:1 比对桩：返回 (是否通过, 相似度)。
+    """1:1 比对桩：返回「比对距离」（欧氏距离，越小越像，保留四位小数）。
 
     真实实现（邓先斌负责）应：
       1. 现场照片提 128 维特征；
-      2. 与 face 表里该学号的存档特征算欧氏距离；
-      3. 距离小于 FACE_MATCH_THRESHOLD 判通过；
-      4. 把相似度换算成 0—1 的四位小数返回。
-    桩实现固定返回，响应里带 mock=True，避免演示时被当成真实准确率。
+      2. 与 face 表里该学号的存档特征算欧氏距离（face_recognition.face_distance）；
+      3. 距离 <= FACE_MATCH_THRESHOLD 判通过。
+    桩实现固定返回一对距离值，响应里带 mock=True，避免演示时被当成真实准确率。
     """
     if force_fail:
-        return False, 0.3125
-    return True, 0.8731
+        return 0.8731  # 距离大 = 不像，模拟未通过
+    return 0.3125      # 距离小 = 像，模拟通过
 
 
 # ---------------------------------------------------------------- 登录
@@ -143,6 +149,8 @@ def login():
         "name": user["name"],
         "role": user["role"],
     }
+    # 让 PERMANENT_SESSION_LIFETIME（config.py）真正生效：关浏览器后 8 小时内仍有效
+    session.permanent = True
     return redirect(url_for("index"))
 
 
@@ -152,7 +160,16 @@ def index():
     user = session.get("user")
     if user is None:
         return redirect(url_for("login_page"))
-    return render_template("index.html", user=user)
+    # 页面清单在视图里算好再传给模板（规范-运行规范 §5.6：模板不做数据构造）。
+    # 系统共 5 个页面：登录、点名（打卡机）、学生管理、记录查询、统计；
+    # 登录与打卡机已实现，其余 3 个待开发。
+    nav_items = [
+        {"label": "点名（打卡机）", "href": url_for("kiosk_page")},
+        {"label": "学生管理", "href": None},
+        {"label": "记录查询", "href": None},
+        {"label": "统计报表", "href": None},
+    ]
+    return render_template("index.html", user=user, nav_items=nav_items)
 
 
 @app.get("/logout")
@@ -200,8 +217,8 @@ def kiosk_verify():
         mock=fail 时模拟「未通过」，用于演示异常与人工复核流程
 
     返回:
-        data 含 passed / similarity / threshold / status / suggestion / next，
-        其中 mock=True 表示这是桩结果。
+        data 含 passed / distance / threshold / status / suggestion / next，
+        其中 distance 为比对面部距离（欧氏距离，越小越像），mock=True 表示这是桩结果。
     """
     if KIOSK["index"] >= len(KIOSK["students"]):
         return err(4001, "本次考勤已结束", 409)
@@ -215,18 +232,17 @@ def kiosk_verify():
     raw = file.read()
     if not raw:
         return err(1001, "照片内容为空")
-    if len(raw) > MAX_CONTENT_LENGTH:
-        return err(1002, "单张照片不能超过 5MB")
 
     student = KIOSK["students"][KIOSK["index"]]
-    passed, similarity = _mock_verify(force_fail=request.args.get("mock") == "fail")
+    distance = _mock_verify(force_fail=request.args.get("mock") == "fail")
+    passed = distance <= FACE_MATCH_THRESHOLD
     status = "出勤" if passed else "待核实"
 
     KIOSK["records"].append({
         "student_no": student["student_no"],
         "name": student["name"],
         "status": status,
-        "similarity": similarity,
+        "distance": distance,
         "verified_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "photo_bytes": len(raw),
     })
@@ -236,7 +252,7 @@ def kiosk_verify():
         "student_no": student["student_no"],
         "name": student["name"],
         "passed": passed,
-        "similarity": similarity,
+        "distance": distance,
         "threshold": FACE_MATCH_THRESHOLD,
         "status": status,
         "suggestion": "比对通过，已记为出勤" if passed else "光线或角度不佳，可重拍，或由教师人工复核",
@@ -259,7 +275,7 @@ def kiosk_skip():
         "student_no": student["student_no"],
         "name": student["name"],
         "status": "缺勤",
-        "similarity": None,
+        "distance": None,
         "verified_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "photo_bytes": 0,
     })

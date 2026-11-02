@@ -5,7 +5,7 @@
 
 * { box-sizing: border-box; }
 
-kiosk, body.kiosk {
+body.kiosk {
   margin: 0;
   height: 100vh;
   display: grid;
@@ -112,6 +112,10 @@ kiosk, body.kiosk {
 .foot .keys { color: #64748b; }
 
 /* ---------- 结束汇总 ---------- */
+/* 下面的 display:flex 会压过浏览器默认的 [hidden]{display:none}，
+   必须显式兜底，否则遮罩一进页面就盖住整个打卡界面 */
+.summary[hidden] { display: none; }
+
 .summary {
   position: fixed;
   inset: 0;

@@ -30,14 +30,19 @@
 
     <h6 class="text-muted mb-3">后续页面（demo 阶段仅占位）</h6>
 
-    <!-- 五个待开发页面：对应优先级清单 P0-05 ~ P0-12，实现后替换为可点击链接 -->
+    <!-- 页面清单由 app.py 的 index 视图传入：已实现的带链接，未实现的标「待开发」 -->
     <div class="row g-3">
-      {% for item in ["发起考勤", "按名单点名", "学生管理", "考勤记录查询", "统计报表"] %}
+      {% for item in nav_items %}
         <div class="col-6 col-md-4">
           <div class="card h-100 text-center py-4">
             <div class="card-body py-0">
-              <div class="small text-muted">{{ item }}</div>
-              <div class="text-secondary small mt-2">待开发</div>
+              {% if item.href %}
+                <a class="small text-decoration-none" href="{{ item.href }}">{{ item.label }}</a>
+                <div class="text-success small mt-2">已实现</div>
+              {% else %}
+                <div class="small text-muted">{{ item.label }}</div>
+                <div class="text-secondary small mt-2">待开发</div>
+              {% endif %}
             </div>
           </div>
         </div>

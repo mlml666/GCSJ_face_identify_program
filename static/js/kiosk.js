@@ -169,11 +169,11 @@
         setLamp('bad', '请重试');
       } else {
         const result = payload.data;
-        const similarity = Number(result.similarity).toFixed(4);
+        const distance = Number(result.distance).toFixed(4);
         showBanner(result.passed ? 'good' : 'bad',
           (result.passed ? '签到成功 · ' : '未通过 · ') + result.suggestion);
         setLamp(result.passed ? 'good' : 'bad',
-          '相似度 ' + similarity + '（阈值 ' + Number(result.threshold).toFixed(2) + '，当前为桩结果）');
+          '比对距离 ' + distance + '（阈值 ' + Number(result.threshold).toFixed(2) + '，当前为桩结果）');
         renderState(result.next);
       }
     } catch (error) {
@@ -260,10 +260,11 @@
   }
   function hideBanner() { bannerEl.className = 'banner'; bannerEl.textContent = ''; }
 
-  // ---------- 键盘：Enter 抓拍、空格缺勤、R 重置 ----------
+  // ---------- 键盘：Enter 抓拍、空格缺勤、M 演示失败、R 重置 ----------
   document.addEventListener('keydown', (event) => {
     if (event.code === 'Enter') { event.preventDefault(); capture(false); }
     else if (event.code === 'Space') { event.preventDefault(); skip(); }
+    else if (event.key === 'm' || event.key === 'M') { event.preventDefault(); capture(true); }
     else if (event.key === 'r' || event.key === 'R') { event.preventDefault(); reset(); }
   });
 
