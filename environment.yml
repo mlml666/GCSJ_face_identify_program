@@ -1,7 +1,8 @@
+# 只负责「Python 版本 + 基础工具」；第三方依赖的唯一来源是 requirements.txt。
+# 改依赖请改 requirements.txt，不要在这里加包，否则两份清单迟早不同步。
 name: facs
 channels:
   - defaults
 dependencies:
   - python=3.9
-  - flask=3.0.3
   - pip

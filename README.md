@@ -1,7 +1,7 @@
 # 课堂人脸验证考勤系统（FACS）
 
 > 成都信息工程大学人工智能学院 · 课程工程实践项目 · 一期 PC 浏览器 Web 端
-> 用「按名单顺序点名 + 现场照片 1:1 人脸验证」替代人工点名，把单节课考勤从约 15 分钟压缩到 5 分钟以内。
+> 用「按名单顺序点名 + 打卡机摄像头现场抓拍 1:1 人脸验证」替代人工点名，把单节课考勤从约 15 分钟压缩到 5 分钟以内。
 
 **验收指标**：整节课（一个班）点名 ≤ 5 分钟；正常光照识别准确率 ≥ 90%（合格线 85%）；考勤数据准确率 100%；单次比对响应 ≤ 2 秒。
 
@@ -11,11 +11,13 @@
 | --- | --- |
 | 需求基线（优先级清单 + 会议纪要 + SRS） | 🟡 待双方签字（SRS V1.1 待修订） |
 | 技术方案与 dlib / face_recognition 验证 | ⬜ 未开始 |
-| 环境与数据准备 | 🟢 开发环境已就绪 |
-| 开发实现（Web 端一期） | 🟢 登录页 demo 完成 |
+| 环境与数据准备 | 🟡 部分就绪（conda 环境已建、Flask 能跑；dlib / face_recognition 未验证；学生照片未收集） |
+| 开发实现（Web 端一期） | 🟢 登录页 demo + 打卡机页面 demo 完成 |
 | 特征库 / 测试 / 培训试运行 / 验收 | ⬜ 未开始 |
 
-代码现状：**只有一个登录页 demo**，在 `feature/login-demo` 分支，按约定不合并进 `main`。
+代码现状：**登录页 demo**（`feature/login-demo`）+ **打卡机页面 demo**（`feature/kiosk-camera`），按约定均不合并进 `main`。
+
+页面口径：系统共 **5 个页面**（登录、点名/打卡机、学生管理、记录查询、统计）。已实现登录页与打卡机页面；原型阶段交付 **4 张**（点名、学生管理、记录查询、统计，不含登录）。
 
 ## 快速开始
 
@@ -29,9 +31,15 @@ conda env create -p .conda -f environment.yml
 # 2. 切到有代码的分支并运行
 git checkout feature/login-demo
 .\.conda\python.exe app.py        # 浏览器打开 http://127.0.0.1:5000
+
+# 3. 打卡机演示（笔记本当终端，需用 localhost 才给摄像头）
+git checkout feature/kiosk-camera
+.\.conda\python.exe app.py        # 打开 http://127.0.0.1:5000/kiosk
 ```
 
 演示账号：`admin / admin123`、`teacher / teacher123`（仅演示，正式版必须替换）。
+
+打卡机页面操作：学生站进虚线框 → 画面稳定且画质达标自动抓拍 → 显示比对结果与比对距离 → 自动切到下一位。键盘：`Enter` 手动抓拍、`M` 演示比对失败、`空格` 记缺勤、`R` 重置演示。当前比对是桩（响应 `mock: true`）：比对距离固定为 0.3125（通过）/ 0.8731（未通过），判定规则 `distance <= threshold`，**不代表真实准确率**。
 
 环境细节、IDE 指定解释器、排错方式见 [环境说明](docs/环境说明-conda虚拟环境使用.md)。
 
@@ -52,9 +60,10 @@ git checkout feature/login-demo
 ├─ README.md
 ├─ requirements.txt             pip 依赖清单
 ├─ environment.yml              conda 环境定义
-├─ app.py                       启动入口 + 登录 demo 路由
+├─ app.py                       启动入口 + 登录与打卡机路由
 ├─ config.py                    配置集中处（密钥、上传限制、比对阈值）
-├─ templates/                   Jinja2 模板
+├─ templates/                   Jinja2 模板（login / index / kiosk）
+├─ static/                      打卡机页面样式与脚本（css/kiosk.css、js/kiosk.js）
 ├─ docs/
 │  ├─ 环境说明-conda虚拟环境使用.md
 │  ├─ 规范-运行规范.md           启动、配置、编码、提交前检查
@@ -74,7 +83,8 @@ git checkout feature/login-demo
 | --- | --- | --- |
 | `main` | 文档基线 | 稳定主干，只接受 PR |
 | `develop` | 文档 + 环境说明 + 规范 | 集成分支，功能分支先合这里 |
-| `feature/login-demo` | `app.py`、`config.py`、`templates/` | 登录 demo，**不合并进 main** |
+| `feature/login-demo` | `app.py`、`config.py`、`templates/login.html` | 登录 demo，**不合并进 main** |
+| `feature/kiosk-camera` | `app.py`、`config.py`、`templates/`、`static/` | 打卡机 demo（摄像头抓拍），**不合并进 main** |
 
 协作流程：
 
@@ -105,12 +115,12 @@ git checkout -b feature/<模块>-<简述>
 | --- | --- |
 | [环境说明](docs/环境说明-conda虚拟环境使用.md) | 创建 / 使用 / 排错 / 清理项目内虚拟环境 |
 | [运行规范](docs/规范-运行规范.md) | 启动方式、配置约定、编码规范、提交前检查清单 |
-| [接口说明规范](docs/规范-接口说明规范.md) | 统一响应、错误码、22 个接口清单与单接口模板 |
+| [接口说明规范](docs/规范-接口说明规范.md) | 统一响应、错误码、接口清单（含已实现 4 个打卡机 demo 接口）与单接口模板 |
 | [团队进度](docs/PROGRESS.md) | 阶段进度、谁在做什么、阻塞项 |
 | [AI 同步](docs/AI_SYNC.md) | 机器可读的进度快照与关键决策 |
 | [分支规范](docs/BRANCHING.md) | 分支模型、命名、提交与合并规则 |
 | [项目资料](docs/项目资料/) | 群文件原始文档 + 已知口径冲突清单 |
-| [交付物](docs/交付物/) | 需求优先级清单 V1.1、需求调研会议纪要 |
+| [交付物](docs/交付物/) | 需求优先级清单 V1.2（现场改为打卡机抓拍）、需求调研会议纪要 |
 
 ## 常见问题
 
@@ -120,6 +130,7 @@ git checkout -b feature/<模块>-<简述>
 | 端口 5000 被占用 | `netstat -ano \| findstr :5000` 找到 PID 后结束进程，或改 `app.run(port=5001)` |
 | `conda activate` 报 shell 未初始化 | `conda init powershell` 后重开终端 |
 | 装 dlib / face_recognition 失败 | 别硬编译，改用预编译 whl 或 conda-forge 的 dlib |
+| 打卡机页面没有画面、控制台报 `NotAllowedError` | 用 `http://127.0.0.1:5000/kiosk` 打开（局域网 IP 下浏览器不给摄像头），并在地址栏相机图标里允许权限 |
 
 ## 红线
 

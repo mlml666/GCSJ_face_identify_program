@@ -8,7 +8,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 环境位置 | `E:\GCSJ_face_identify_program\.conda` |
+| 环境位置 | `<仓库根目录>\.conda`（示例：`E:\GCSJ_face_identify_program\.conda`；换机器换成自己的仓库路径即可） |
 | Python 版本 | 3.9.25（实际创建结果） |
 | Flask 版本 | 3.0.3 |
 | 解释器 | `.conda\python.exe` |
@@ -20,7 +20,7 @@
 方式一：按统一清单创建（推荐，团队口径一致）
 
 ```powershell
-cd E:\GCSJ_face_identify_program
+cd <仓库根目录>
 conda env create -p .conda -f environment.yml
 ```
 
@@ -47,6 +47,35 @@ conda install -p .conda flask=3.0.3 -y     # 推荐用 conda 装 Flask
 
 期望输出 Python 3.9.x 和 `flask 3.0.3`。
 
+## 二之二、依赖唯一来源
+
+**依赖只认 `requirements.txt`**。`environment.yml` 只负责 Python 版本与 `pip`，不再声明第三方包——两份清单各写一遍迟早不同步。装依赖一律：
+
+```powershell
+.\.conda\python.exe -m pip install -r requirements.txt
+```
+
+## 二之三、国内网络加速（国内机器建议先配）
+
+```powershell
+# pip 镜像（只配一次，写进用户级配置）
+.\.conda\python.exe -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+# conda 镜像（写进 ~/.condarc；改完 conda clean -i 清索引缓存）
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+```
+
+### 人脸识别依赖（下一阶段用，**现在不要装**）
+
+> 这两步要等邓先斌在真机上验证后再写进 `requirements.txt`。dlib 在 Windows 上源码编译常失败，用预编译轮子：
+
+```powershell
+.\.conda\python.exe -m pip install dlib-bin -i https://pypi.tuna.tsinghua.edu.cn/simple
+.\.conda\python.exe -m pip install face_recognition --no-deps
+.\.conda\python.exe -m pip install numpy Pillow click -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
 ## 三、日常使用
 
 ### 方式 A：不激活，直接用解释器（推荐）
@@ -66,7 +95,7 @@ conda install -p .conda flask=3.0.3 -y     # 推荐用 conda 装 Flask
 ### 方式 B：激活环境
 
 ```powershell
-conda activate E:\GCSJ_face_identify_program\.conda
+conda activate <仓库根目录>\.conda
 python app.py
 conda deactivate
 ```
@@ -81,7 +110,7 @@ conda init powershell     # 然后关掉窗口重开
 
 **PyCharm**
 `Settings → Project → Python Interpreter → Add Interpreter → Conda Environment → Existing`
-→ 解释器路径填 `E:\GCSJ_face_identify_program\.conda\python.exe`
+→ 解释器路径填 `<仓库根目录>\.conda\python.exe`（把尖括号部分换成你的实际路径）
 
 **VS Code**
 `Ctrl+Shift+P → Python: Select Interpreter → Enter interpreter path`
