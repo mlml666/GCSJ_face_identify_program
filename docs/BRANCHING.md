@@ -18,11 +18,18 @@ main      稳定主干，只接受 PR 合入，任何时刻可运行
 
 ## 三、当前分支清单
 
-| 分支 | 创建人 | 内容 | 状态 | 合并去向 |
+| 分支 | 负责人 | 内容 | 状态 | 合并去向 |
 | --- | --- | --- | --- | --- |
-| `main` | 马力 | README、docs（进度/规范/资料/交付物） | 已提交 | 不接受直接提交 |
-| `develop` | 马力 | 与 main 一致 | 集成分支 | 接收 `feature/*`、`fix/*` |
-| `feature/login-demo` | 马力 | `app.py` + `templates/login.html`、`index.html` | 已提交，未合并 | **不合并**，仅评审参考 |
+| `main` | 马力 | README、docs（进度/规范/资料/交付物） | 已提交并推送（GitHub 上**非**默认分支） | 不接受直接提交 |
+| `develop` | 马力 | 与 main 一致（文档基线 + 环境与规范） | 已提交并推送，GitHub **默认分支** | 接收 `feature/*`、`fix/*` |
+| `feature/login-demo` | 马力 | `app.py` + `config.py` + `templates/login.html`、`index.html` | 已提交并推送，未合并 | **不合并**，仅评审参考 |
+| `feature/kiosk-camera` | 马力 | 在登录 demo 基线上加打卡机：`/kiosk`、`/api/v1/kiosk/*`、`static/css|js/kiosk.*` | 已提交并推送，未合并 | **不合并**，演示分支；真实比对接入后另开正式分支 |
+
+说明：`feature/kiosk-camera` 已推送到 GitHub，但按当前约定仍是「不合并进 main 的演示分支」；要进主线需先接真实 face_recognition、落 SQLite 记录，再抽成正式 `feature/attendance-*` 分支走 PR 评审。
+
+## 三之二、本次整改分支
+
+`fix/req-review-2026-11-02`：按《FACS 项目审查整改任务清单》做的口径统一与冗余清理（不推送、不合并），评审通过后由负责人决定去向。
 
 ## 四、提交信息格式
 
