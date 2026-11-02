@@ -1,0 +1,55 @@
+<!doctype html>
+<!--
+  打卡机页面（kiosk）
+  用途：把笔记本当打卡终端 —— 逐个学生上前，摄像头抓拍后做 1:1 比对
+  对应需求：P0-07 按名单顺序点名、P0-08 现场比对（采集方式由上传改为摄像头）
+  数据来源：/api/v1/kiosk/current、/api/v1/kiosk/verify、/api/v1/kiosk/skip、/api/v1/kiosk/reset
+  注意：摄像头需要安全上下文，必须用 http://127.0.0.1:5000/kiosk 打开
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>打卡机 · 课堂人脸验证考勤系统</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/kiosk.css') }}">
+</head>
+<body class="kiosk">
+  <!-- 顶部：课程 / 日期 / 进度 -->
+  <header class="top">
+    <div class="course">{{ course }}　·　{{ date }}</div>
+    <div class="progress" id="progress">第 1 / {{ total }} 位</div>
+  </header>
+
+  <main class="main">
+    <!-- 左侧：当前待打卡学生（店里的大字号提示） -->
+    <section class="current">
+      <div class="label">请以下同学上前刷脸</div>
+      <div class="name" id="stu-name">—</div>
+      <div class="no" id="stu-no">—</div>
+      <div class="lamp" id="quality">摄像头启动中…</div>
+    </section>
+
+    <!-- 右侧：摄像头预览 + 取景框 + 结果条 -->
+    <section class="camera">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="guide" id="frame"></div>
+      <div class="banner" id="banner"></div>
+    </section>
+  </main>
+
+  <!-- 底部：提示与快捷键 -->
+  <footer class="foot">
+    <span id="hint">正在请求摄像头权限…</span>
+    <span class="keys">Enter 手动抓拍　空格 记缺勤　R 重置演示</span>
+  </footer>
+
+  <!-- 结束汇总（考勤走完名单后显示） -->
+  <div class="summary" id="summary" hidden>
+    <h2>本次考勤结束</h2>
+    <p id="summary-text"></p>
+    <button id="reset-btn" type="button">重置演示</button>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/kiosk.js') }}"></script>
+</body>
+</html>
